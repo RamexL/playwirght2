@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+    stages {
+        stage('install playwright') {
+        steps {
+            bat '''
+            npm i
+            npx playwright install
+            '''
+        }
+        }
+     /*     stage('help') {
+        steps {
+            bat 'npx playwright test --help'
+        }
+        } */
+        stage('test') {
+        steps {
+        
+           // bat 'npx playwright test login '
+            bat '''
+            npx allure generate -c -o ./allure-results
+            npx playwright test login
+            '''
+        }
+     /*       post {
+            success {
+            archiveArtifacts(artifacts: 'homepage-*.png', followSymlinks: false)
+            bat 'rm -rf *.png'
+            }
+        } */
+        }
+    }
+    post {
+        always {
+            allure([
+                includeProperties: true,
+                jdk: '',
+                properties: [],
+                reportBuildPolicy: 'ALWAYS',
+                results: [[path: 'allure-results']]
+            ])
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
